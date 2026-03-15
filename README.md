@@ -1,20 +1,2 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
-
-# Run and deploy your AI Studio app
-
-This contains everything you need to run your app locally.
-
-View your app in AI Studio: https://ai.studio/apps/7658637e-ffbe-4143-9b8e-82cb53f3f770
-
-## Run Locally
-
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+大学城美食地图
+具体要求：【背景】 某高校联盟（3-5所大学）周边聚集了大量餐饮商户，但学生普遍面临"吃什么"的决策困境——信息分散在各类平台，缺乏针对学生群体的本地化美食指南。 【任务】 使用 AI Coding工具，设计并搭建一个「大学城美食地图」网页应用，帮助用户发现和浏览大学城周边的餐厅和美食信息。 【建议】 1. 可结合你了解到的用户痛点或需求，自由设计产品。 2. 不必追求技术细节，优先呈现产品结构和功能设计即可。
