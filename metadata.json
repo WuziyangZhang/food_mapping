@@ -1,0 +1,7 @@
+{
+  "name": "Remix: 大学城美食地图",
+  "description": "面向高校联盟学生的本地化美食发现与决策平台，提供AI智能推荐、健康控卡信息、场景化筛选及地图导览功能。",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}

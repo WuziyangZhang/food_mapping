@@ -1,0 +1,84 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: posts
+    // Document ID: auto-generated
+    // Fields:
+    //   - userId: string (required) - UID of creator
+    //   - userName: string (required) - Name of creator
+    //   - userAvatar: string (optional) - Avatar URL
+    //   - content: string (required) - Review text (max 1000 chars)
+    //   - imageUrl: string (required) - Photo URL
+    //   - restaurantId: string (optional) - Linked restaurant
+    //   - restaurantName: string (optional) - Restaurant name
+    //   - rating: number (required) - 1-5
+    //   - createdAt: timestamp (required)
+    //   - likes: list (required) - Array of UIDs
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function isValidPost(data) {
+      return hasRequiredFields(['userId', 'userName', 'content', 'imageUrl', 'rating', 'createdAt', 'likes']) &&
+             hasOnlyAllowedFields(['userId', 'userName', 'userAvatar', 'content', 'imageUrl', 'restaurantId', 'restaurantName', 'rating', 'createdAt', 'likes']) &&
+             data.userId is string &&
+             data.userName is string && data.userName.size() < 100 &&
+             data.content is string && data.content.size() < 1000 &&
+             data.imageUrl is string && data.imageUrl.size() < 1000 &&
+             data.rating is number && data.rating >= 1 && data.rating <= 5 &&
+             data.createdAt is timestamp &&
+             data.likes is list && data.likes.size() < 1000;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /posts/{postId} {
+      allow read: if isAuthenticated();
+      
+      allow create: if isAuthenticated() && 
+                      isValidPost(request.resource.data) && 
+                      request.resource.data.userId == request.auth.uid &&
+                      request.resource.data.likes.size() == 0;
+      
+      allow update: if isAuthenticated() && 
+                      isValidPost(request.resource.data) && 
+                      (
+                        // Owner update
+                        (isOwner(resource.data.userId) && request.resource.data.userId == resource.data.userId) ||
+                        // Non-owner like update
+                        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes']))
+                      );
+      
+      allow delete: if isOwner(resource.data.userId);
+    }
+
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+  }
+}
